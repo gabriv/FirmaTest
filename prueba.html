@@ -1,0 +1,47 @@
+<SCRIPT LANGUAGE="javascript" TYPE="text/javascript" SRC="capicom.js"></SCRIPT>
+<script lang="javascript">
+    var entidades='FNMT Clase 2 CA,PUBLIC-R-SERGAS,SERGAS-USR-L0,CERTIFICADO_PRUEBA,SERGAS-SSL-L0,AC Firmaprofesional - CA1,Autoridad de Certificacion Firmaprofesional CIF A62634068,AC DNIE 001,AC DNIE 002,AC DNIE 003,AC FNMT Usuarios,RACER,Camerfirma AAPP II - 2014';
+    var crypt = new Crypt(entidades);
+
+    function sign() {
+      var xml = document.getElementById('xml').value;
+      try {
+        xml = xml.replace(/\r\n/g, "\n");
+        var firma = crypt.firmar(xml);
+        //alert("firmado: " + firma);
+        if (firma != false){
+          document.getElementById('firma').value = firma;
+          //alert("verificado: " + crypt.verificar(firma, xml)); //Utilidad de CAPICOM, comprueba tambien el certificado
+        }else{
+          alert("error 1");
+        }
+      } catch (e) {
+          alert("error 2");
+      }
+    }
+
+    function verify() { //Hacemos lo mismo que el crypt.verificar(), con la diferencia de solo comprobar la firma, no el certificado
+      var xml = document.getElementById('xml').value;
+      var firma = document.getElementById('firma').value
+      var CAPICOM_VERIFY_SIGNATURE_ONLY = 0;
+      var CAPICOM_VERIFY_SIGNATURE_AND_CERTIFICATE = 1;
+      //alert("firma: " + firma);
+      //alert("xml: " + xml);
+      try {
+        var SignedData = new ActiveXObject("CAPICOM.SignedData");
+        SignedData.Content=xml;
+        SignedData.Verify(firma, true, CAPICOM_VERIFY_SIGNATURE_ONLY);
+        alert('Firma Verificada');
+      } catch (e) {
+        alert("ERROR : " + e.description);
+      }
+    }
+</script>
+<body>
+  XML firma: <textarea id="xml" cols="100" rows="19"></textarea>
+  <br><br>
+  Firma: <textarea id="firma" cols="80" rows="10"></textarea>
+  <br><br>
+  <button onclick="sign()">Firmar</button>
+  <button onclick="verify()">Verificar</button>
+</body>
